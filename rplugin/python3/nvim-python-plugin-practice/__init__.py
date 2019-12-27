@@ -1,20 +1,16 @@
-import neovim
+import typing
+
+import pynvim as neovim
+
+Args = typing.List[typing.Any]
+
 
 @neovim.plugin
 class TestPlugin(object):
 
     def __init__(self, nvim):
-        self.nvim = nvim
+        self._nvim = nvim
 
-    @neovim.function("TestFunction", sync=True)
-    def testfunction(self, args):
-        return 3
-
-    @neovim.command("TestCommand", range='', nargs='*')
-    def testcommand(self, args, range):
-        self.nvim.current.line = ('Command with args: {}, range: {}'
-                                  .format(args, range))
-
-    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
-    def on_bufenter(self, filename):
-        self.nvim.out_write("testplugin is in " + filename + "\n")
+    @neovim.function('_rpctest_init', sync=True)
+    def init_channel(self, args: Args) -> None:
+        self._nvim.vars['rpctest#_channel_id'] = self.nvim.channel_id
